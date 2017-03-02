@@ -1,0 +1,77 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>用promise实现动画</title>
+	<style type="text/css">
+		.ball{
+			width: 40px;
+			height: 40px;
+			border-radius: 20px
+		}
+		.ball1{
+			background: red
+		}
+		.ball2{
+			background: yellow
+		}
+		.ball3{
+			background: green
+		}
+	</style>
+	<script type="text/javascript" src="./node_modules/bluebird/js/browser/bluebird.min.js"></script>
+</head>
+<body>
+	<div class="ball ball1" style="margin-left:0"></div>
+	<div class="ball ball2" style="margin-left:0"></div>
+	<div class="ball ball3" style="margin-left:0"></div>
+
+	<script type="text/javascript">
+		var ball1=document.querySelector('.ball1');
+		var ball2=document.querySelector('.ball2');
+		var ball3=document.querySelector('.ball3');
+
+		var Promise=window.Promise;   //导入了bluebird后就可以用promise了
+
+		function PromiseAnimation(ball,distance){
+			return new Promise(function(resolve,reject){
+				function _animate(){
+					setTimeout(function(){
+						var marginLeft=parseInt(ball.style.marginLeft,10);
+						if(marginLeft===distance){    //如果移动到目的位置，则执行回调函数
+							resolve()   
+						//reject 是拒绝，跳转到catch error
+						//resolve 是解决，下一步，即跳转到下一个promise操作
+						}else{
+							if(marginLeft<distance){   //如果球在左侧
+								marginLeft++
+							}else{
+								marginLeft--
+							}
+							ball.style.marginLeft=marginLeft+'px';
+							_animate();
+						}
+					},13);
+				}
+				_animate();
+			});
+		}
+		
+		PromiseAnimation(ball1,100)
+			.then(function(){
+				return PromiseAnimation(ball2,200)
+			})
+			.then(function(){
+				return PromiseAnimation(ball3,300)
+			})
+			.then(function(){
+				return PromiseAnimation(ball3,150)
+			})	
+			.then(function(){
+				return PromiseAnimation(ball2,150)
+			})	
+			.then(function(){
+				return PromiseAnimation(ball1,150)
+			});
+	</script>
+</body>
+</html>
