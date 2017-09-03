@@ -1,0 +1,67 @@
+<!doctype HTML>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+<meta content="telephone=no,email=no" name="format-detection" />
+<title>首页</title>
+<meta name="keywords" content="" />
+<meta name="description" content="" />
+</head>
+<body>
+首页
+<form action="/file" method="post" enctype="multipart/form-data">
+<input type="file" name="image" size="50" />
+<br />
+<input type="submit" value="上传文件" />
+</form>
+
+
+<script type="text/javascript">
+var Ajax = {
+    get: function(url, fn) {
+        var xhr = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject('Microsoft.XMLHTTP');
+        xhr.open('get', url, true); //默认true为异步,false为同步
+        if ('withCredentials' in xhr) { //默认情况下widthCredentials为false，我们需要设置widthCredentials为true开启跨域CORS
+            xhr.withCredentials = true;
+        }
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 304)) {
+                fn.call(this, xhr.responseText);
+            }
+        };
+        xhr.send(null);
+    },
+    post: function(url, data, fn) {
+        var xhr = window.XMLHttpRequest ? new XMLHttpRequest() : new ActiveXObject('Microsoft.XMLHTTP');
+        xhr.open('post', url, true); //默认true为异步,false为同步
+        if ('withCredentials' in xhr) { //默认情况下widthCredentials为false，我们需要设置widthCredentials为true开启跨域CORS
+            xhr.withCredentials = true;
+        }
+        xhr.setRequestHeader('Content-type', 'application/x-www-form-urlencoded');
+        xhr.onreadystatechange = function() {
+            if (xhr.readyState == 4 && (xhr.status == 200 || xhr.status == 304)) {
+                fn.call(this, xhr.responseText);
+            }
+        };
+        xhr.send(data);
+    }
+};
+
+Ajax.get('/json?first=tarymee&last=slimyth', function(response) {
+    console.log(JSON.parse(response))
+});
+
+Ajax.post('/post', '', function(response) {
+    console.log(response)
+});
+
+
+Ajax.post('/post2', 'first=tarymee&last=slimyth', function(response) {
+    console.log(JSON.parse(response))
+});
+
+
+</script>
+</body>
+</html>

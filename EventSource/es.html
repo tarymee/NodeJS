@@ -1,0 +1,22 @@
+<!doctype HTML>
+<html>
+<head>
+<meta http-equiv="content-type" content="text/html; charset=utf-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no"/>
+<meta content="telephone=no" name="format-detection" />
+<meta content="email=no" name="format-detection" />
+<title>首页</title>
+</head>
+<body>
+
+<script type="text/javascript">
+var es = new EventSource('/message');// /message是服务端支持EventSource的接口
+es.onmessage = function(e){
+    console.log(e.data); // 打印服务器推送的信息
+}
+
+</script>
+
+
+</body>
+</html>
