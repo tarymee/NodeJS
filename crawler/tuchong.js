@@ -9,6 +9,21 @@ const superagent = require('superagent')
 // }
 
 
+
+
+
+const tuchongConfig = {
+    common: 'https://tuchong.com/rest/tags/',
+    list: [{
+        title: '人像',
+        url: 'https://tuchong.com/rest/tags/' + encodeURIComponent('人像') + '/posts?page=1&count=10&order=weekly'
+    }, {
+        title: '儿童',
+        url: 'https://tuchong.com/rest/tags/' + encodeURIComponent('儿童') + '/posts?page=1&count=10&order=weekly'
+    }]
+}
+
+
 // 检测创建多级文件夹
 function mkdirsSync(dirpath, mode) {
     try {
@@ -68,38 +83,66 @@ let loadImg = function(src) {
     })
 }
 
+var loadData = function (data) {
+    getData(data.url).then(res => {
+        console.log(`Loadding ${data.title} Column`)
+        // 处理数据
+        let postList = res.body.postList
+        let picArr = []
+        postList.map(item => {
+            if (item.type === 'multi-photo') {
+                item.images.forEach((item, i) => {
+                    item.src = 'https://photo.tuchong.com/' + item.user_id + '/f/' + item.img_id + '.jpg'
+                    item.src1 = 'https://photo.tuchong.com/' + item.user_id + '/l/' + item.img_id + '.jpg'
+                    item.src2 = 'https://photo.tuchong.com/' + item.user_id + '/s/' + item.img_id + '.jpg'
+                    item.src3 = 'https://photo.tuchong.com/' + item.user_id + '/g/' + item.img_id + '.jpg'
+                })
+                picArr.push({
+                    post_id: item.post_id,
+                    title: item.title,
+                    url: item.url,
+                    images: item.images
+                })
+            }
+        })
 
-// 加载接口
-getData('https://tuchong.com/rest/tags/' + encodeURIComponent('儿童') + '/posts?page=1&count=20&order=weekly&before_timestamp=').then(res => {
-    // 处理数据
-    let postList = res.body.postList
-    let picArr = []
-    postList.map(item => {
-        if (item.type === 'multi-photo') {
-            item.images.forEach((item, i) => {
-                item.id = item.img_id
-                item.src = 'https://photo.tuchong.com/' + item.user_id + '/g/' + item.img_id + '.jpg'
-            })
-            picArr.push({
-                post_id: item.post_id,
-                images: item.images
-            })
-        }
-    })
+        let dirString = './img/tuchong/' + data.title + '/'
+        let dirResolve = path.resolve(__dirname, dirString)
 
-    // 循环load图片
-    picArr.forEach((item, i) => {
-        console.log('将要下载' + item.post_id + '图片组')
-        let postPath = path.resolve(__dirname, './img/tuchong/' + item.post_id)
-        mkdirsSync(postPath)
-        item.images.forEach((item2, i) => {
-            loadImg(item2.src).then((res) => {
-                fs.writeFileSync(path.resolve(postPath, item2.id + '.jpg'), res.body, null)
-                console.log(`下载成功: ${item2.src}`)
-            }).catch((err) => {
-                console.log(`下载失败: ${item2.src}`)
+        // 创建文件夹
+        mkdirsSync(dirResolve)
+
+        // 存入json
+        fs.writeFileSync(path.resolve(dirResolve, data.title + '.json'), JSON.stringify(picArr))
+
+        // 循环load图片
+        picArr.forEach((item, i) => {
+            console.log('Want To Load ' + item.post_id + ' Group')
+            let postPath = path.resolve(dirResolve, item.post_id)
+            mkdirsSync(postPath)
+            item.images.forEach((item2, i) => {
+                if (fs.existsSync(path.resolve(postPath, item2.img_id + '.jpg'))) {
+                    console.log(`Had Download: ${item2.src}`)
+                } else {
+                    loadImg(item2.src).then((res) => {
+                        fs.writeFileSync(path.resolve(postPath, item2.img_id + '.jpg'), res.body)
+                        console.log(`Success: ${item2.src}`)
+                    }).catch((err) => {
+                        console.log(`Fail: ${item2.src}`)
+                    })
+                }
+
             })
         })
-    })
 
-})
+    })
+}
+
+
+
+var start = async function () {
+    loadData(tuchongConfig.list[0])
+    loadData(tuchongConfig.list[1])
+}
+
+start()
