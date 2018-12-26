@@ -1,0 +1,25 @@
+{
+  "name": "tarymee-server",
+  "version": "0.0.1",
+  "description": "A node server.(node服务器)",
+  "keywords": [
+    "server"
+  ],
+  "author": "tarymee <tarymee@gmail.com> (https://github.com/tarymee)",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/tarymee/tarymee-server.git"
+  },
+  "bugs": {
+    "url": "https://github.com/tarymee/tarymee-server/issues"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "mime": "^2.4.0"
+  }
+}
