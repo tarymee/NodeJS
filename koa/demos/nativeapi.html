@@ -1,0 +1,165 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>nativeapi</title>
+  <style>
+    button {
+      margin: 5px;
+    }
+  </style>
+</head>
+
+<body>
+  <iframe frameborder="0" src="http://localhost:10000/static/smart100/c.html"></iframe>
+  <button id="add">index: 0</button>
+  <button id="nativeapi">nativeapi</button>
+  <button id="getContextSync">Module.getContextSync【获取上下文】</button>
+  <button id="checkPermission">Module.checkPermission【权限校验】</button>
+  <button id="exitPage">Native.exitPage【关闭页面】</button>
+  <button id="linkToPage">Module.linkToPage【跳转低码表单】</button>
+  <button id="createPageUrl">Module.createPageUrl【创建低码表单url】</button>
+  <button id="linkToModule">Module.linkToModule【打开SPU页面】</button>
+  <button id="apiRequest">Module.apiRequest【服务接口请求】</button>
+  <button id="getWebInitParams">aPaaS.getWebInitParams【日志】</button>
+  <button id="getSystemInfoSync">Native.getSystemInfoSync【系统信息】</button>
+  <button id="getIndextagSync">Module.getIndextagSync【获取当前url的indextag】</button>
+  <button id="callPageEvent">Module.callPageEvent【调用低码表单监听事件】</button>
+</body>
+
+<script type="text/javascript">
+  window.aaaa = 1
+
+
+  let index = 0
+  document.getElementById('add').addEventListener('click', () => {
+    index++
+    document.getElementById('add').innerHTML = `index: ${index}`
+  }, false)
+
+  document.getElementById('nativeapi').addEventListener('click', () => {
+    console.log('nativeapi')
+    console.log(window.Module)
+    console.log(window.Native)
+    console.log(window.aPaaS)
+  }, false)
+
+  document.getElementById('getContextSync').addEventListener('click', () => {
+    console.log('getContextSync')
+    const context = window.Module.getContextSync()
+    console.log(context)
+  }, false)
+
+
+  document.getElementById('checkPermission').addEventListener('click', () => {
+    console.log('checkPermission')
+    const flag = window.Module.checkPermission({
+      modulekey: 'smartconfigurationcenter'
+    })
+    console.log(flag)
+  }, false)
+
+  document.getElementById('exitPage').addEventListener('click', () => {
+    console.log('exitPage')
+    window.Native.exitPage()
+  }, false)
+
+  document.getElementById('linkToPage').addEventListener('click', () => {
+    console.log('linkToPage')
+    window.Module.linkToPage({
+      pagecode: '954259048415498327'
+    })
+  }, false)
+
+  document.getElementById('createPageUrl').addEventListener('click', () => {
+    console.log('createPageUrl')
+    window.Module.createPageUrl({
+      pagecode: '1113343228272316515',
+      complete: function (code, url, msg) {
+        if (code === 200) {
+          console.log(url)
+          // spu 页面自行创建 iframe 并把 url 赋值给 iframe 的 src 属性
+        } else {
+          throw Error(msg)
+        }
+      }
+    })
+  }, false)
+
+  document.getElementById('linkToModule').addEventListener('click', () => {
+    console.log('linkToModule')
+    window.Module.linkToModule({
+      mode: 'popup', // popup | push
+      // mode: 'push',
+      modulekey: 'customervisit',
+      indextag: 'h5-visit-history',
+      query: {},
+      title: '拜访历史记录',
+      pagesize: {
+        width: '1000',
+        height: '600'
+      }
+    })
+  }, false)
+
+  document.getElementById('apiRequest').addEventListener('click', () => {
+    console.log('apiRequest')
+    window.Module.apiRequest({
+      modulekey: 'demospu',
+      apitag: 'pagelist',
+      body: {
+        pageindex: '1',
+        pagesize: '1',
+        status: '',
+        name: ''
+      },
+      complete: (code, data, msg) => {
+        if (code === 200) {
+          console.log(data)
+        } else {
+          throw Error(msg)
+        }
+      }
+    })
+  }, false)
+
+  document.getElementById('getWebInitParams').addEventListener('click', async () => {
+    console.log('getWebInitParams')
+    const data = await window.aPaaS.getWebInitParams()
+    console.log(data)
+  }, false)
+
+  document.getElementById('getSystemInfoSync').addEventListener('click', async () => {
+    console.log('getSystemInfoSync')
+    const data = window.Native.getSystemInfoSync()
+    console.log(data)
+  }, false)
+
+  document.getElementById('getIndextagSync').addEventListener('click', async () => {
+    console.log('getIndextagSync')
+    const data = window.Module.getIndextagSync({
+      url: location.href
+    })
+    console.log(data)
+  }, false)
+
+  document.getElementById('callPageEvent').addEventListener('click', () => {
+    console.log('callPageEvent')
+    window.Module.callPageEvent({
+      key: 'eventtest',
+      data: {
+        pageindex: '1',
+        pagesize: '1',
+        status: '',
+        name: ''
+      }
+    })
+    setTimeout(() => {
+      window.Native.exitPage()
+    }, 1000)
+  }, false)
+</script>
+
+</html>
